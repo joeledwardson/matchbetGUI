@@ -1,0 +1,13 @@
+{% load templatefunctions %}
+{# navigation bar #}
+{# Retrieves view_classes from views and displays a link to each #}
+
+
+<ul id='navbar'>
+    {% get_view_classes as views %}
+    {% for view in views %}
+    <li>
+        <a href="{% url view.view_name|v %}">{{ view|title }}</a>
+    </li>
+    {% endfor %}
+</ul>

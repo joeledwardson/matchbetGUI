@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+    {% load templatefunctions %}
+
+    <head>
+        <meta charset="utf-8">
+        {% include "getstatics.html" %}
+    </head>
+
+    <body>
+
+        {# page navigation #}
+        {% block nav %}
+        {% include "nav.html" %}
+        {% endblock %}
+
+
+        {# page title #}
+        <h1>{% block title %}
+            {{ view|title }}
+        {% endblock %}</h1>
+        
+
+        <br>
+
+        {# create form #}
+        {% block form_new %}
+        {% with formnew_id="new_object_form" %}
+        {% include "formnew.html" %}
+        {% endwith %}
+        {% endblock %}
+
+        {# page break #}
+        <hr>
+
+        {# filter form - takes use filter.form as form in context #}
+        {% block form_filter %}
+        {% with view.filter.form as form %}{% with formfilter_id="filter_form" %}
+        {% include "formfilter.html" %}
+        {% endwith %}{% endwith %}
+        {% endblock %}
+
+        {# show datbase table - user filter queryset in context #}
+        {% include "table.html" %}
+        <br>
+
+        {# show log at bottom #}
+        {% include "log.html" %}
+
+
+    </body>
+</html>

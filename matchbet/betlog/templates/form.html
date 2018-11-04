@@ -1,0 +1,35 @@
+{# pass django Models.Forms as [form] to this to render post/update form #}
+{% load crispy_forms_tags %}
+{% load templatefunctions %}
+
+{% comment %}
+Inputs:
+    view.view_name - view name to return to
+    form - form to display
+
+Defaults:
+    id - form_object
+    action - post to current view name using [view.view_name]
+    display - hidden
+    buttons - submit only
+{% endcomment %}
+
+
+{# can put extra info at top of form here #}
+{% block form_top %}{% endblock %}
+
+<form method="{% block form_method %}post{% endblock %}"
+      action="{% block form_action %}{% url view.view_name|v %}{% endblock %}"
+      id="{% block form_id %}object_form{% endblock form_id %}"
+      style="width:fit-content; display:{% block form_display %}none{% endblock %}">
+
+    {% csrf_token %}
+    {{ form|crispy }}
+
+    {% block form_buttons %}
+    <input type="submit" value="Submit" class= {% button_classes %}>
+    {% endblock %}
+</form>
+
+{# can put extra info at bottom of form here #}
+{% block form_bottom %}{% endblock %}

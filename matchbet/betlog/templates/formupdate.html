@@ -1,0 +1,28 @@
+{% extends "form.html" %}
+{% load templatefunctions %}
+
+{% comment %}
+Update an object
+Inputs:
+    form - django Models.Forms 
+{% endcomment %}
+
+
+
+{# include statics for datetime picker and css files #}
+{% block form_top %}{% include "getstatics.html" %}{% endblock %}
+
+{# change form id #}
+{% block form_id %}form_update{% endblock %}
+
+{# action is post to current url (interpreted different as post) #}
+{% block form_action %}{{ view.my_url }}{% endblock %}
+
+{# need to show form! default is hidden #}
+{% block form_display %}block{% endblock %}
+
+{# cancel button to return to standard list #}
+{% block form_buttons %}
+<input type="submit" value="Submit">
+<a href="{% get_url view.from_viewname view.from_view_kwargs %}"><input type="button" value="Cancel"></a>
+{% endblock %}

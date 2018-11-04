@@ -1,0 +1,27 @@
+{% load templatefunctions %}
+
+<table>
+    <tr>
+        <td><input type="button" id="filterFormButton" onclick="ToggleFilterForm()" value="Filter"></td>
+        <td><a href="{% url view.view_name|_construct_viewname %}"><input type="button" value="Clear"></a></td>
+    </tr>
+</table>
+<form id="filterForm" style="display:none" action="" method="get">
+    <table>
+        {{ filter.form.as_table }}
+        <tr>
+            <td><input id="filterSubmit" type="submit"></td>
+        </tr>
+    </table>
+</form>
+<br>
+<script>
+    filterShown = false;
+    displays = {true: 'block', false: 'none'};
+    buttonValues = {true: 'Hide filters', false: 'Filter'};
+    function ToggleFilterForm() {
+        filterShown = !filterShown;
+        document.getElementById('filterForm').style.display = displays[filterShown];
+        document.getElementById('filterFormButton').value = buttonValues[filterShown];
+    }
+</script>
