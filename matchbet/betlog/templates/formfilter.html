@@ -20,7 +20,7 @@ Inputs:
             hide_prompt="Hide">
     </span>
     <span>
-        <a href="{% url view.view_name|v %}">
+        <a href="{% get_url view.view_name view.view_kwargs %}">
             <input type="button" value="Clear" class="{% button_classes %}">
         </a>
     </span>

@@ -5,6 +5,7 @@
 {% comment %}
 Inputs:
     view.view_name - view name to return to
+    view.view_kwargs - (optional) key word arguments for view
     form - form to display
 
 Defaults:
@@ -17,9 +18,8 @@ Defaults:
 
 {# can put extra info at top of form here #}
 {% block form_top %}{% endblock %}
-
 <form method="{% block form_method %}post{% endblock %}"
-      action="{% block form_action %}{% url view.view_name|v %}{% endblock %}"
+      action="{% block form_action %}{% get_url view.view_name view.view_kwargs %}{% endblock %}"
       id="{% block form_id %}object_form{% endblock form_id %}"
       style="width:fit-content; display:{% block form_display %}none{% endblock %}">
 

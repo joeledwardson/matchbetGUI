@@ -1,16 +1,22 @@
 import logging
-from os.path import exists
+import platform
+from pathlib import Path
 
 # logger instance
 server_logger = logging.getLogger('server_logger')
 
+log_name = 'bet_server.log'
+
 # path to store log file
-log_path = '/var/log/bet_server.log'
+if platform.system() == 'Windows':
+    log_path = '{}\{}'.format(Path.home(), log_name)
+elif platform.system() in ['Linux', 'Ubuntu']:
+    log_path = '/var/log/{}'.format(log_name)
+else:
+    raise Exception('platform "{}" not recognised'.format(platform.system()))
 
 # retrieve all log messages
 def get_log():
-    if not exists(log_path):
-        return '' # file does not exist
     with open(log_path) as f:
         return list(reversed(f.readlines())) # return reversed list so newest at top
 

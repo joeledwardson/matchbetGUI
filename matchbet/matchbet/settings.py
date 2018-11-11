@@ -85,10 +85,11 @@ WSGI_APPLICATION = 'matchbet.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mysql.connector.django',
+        #'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mbet',
         'USER': 'user',
         'PASSWORD': 'password',
-        'HOST': '192.168.1.202',
+        'HOST': '192.168.0.202',
         'PORT': '33338'
     }
 }

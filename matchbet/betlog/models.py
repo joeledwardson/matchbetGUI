@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django import forms
 from datetime import date, datetime
-from django.core.validators import MinValueValidator
+from django.core.validators import RegexValidator
 import locale
 
 # *** Common structure
@@ -52,15 +52,13 @@ class Site(models.Model):
     name = models.CharField(max_length=30,
                             verbose_name="Name",
                             blank=False,
-                            unique=True)
+                            unique=True,
+                            validators=[RegexValidator(
+                                regex=r'[a-zA-Z0-9 ]+',
+                                message='Please enter a valid character or space'
+                            )])
 
     # current balance - dependent on transactions
-    # balance = models.DecimalField(default=0,
-    #                               verbose_name="Balance",
-    #                               decimal_places=2,
-    #                               max_digits=7,
-    #                               blank=False,
-    #                               editable=False)
     balance = MyMoneyField(default=0,
                            max_digits=14,
                            decimal_places=2,
@@ -75,7 +73,7 @@ class Site(models.Model):
     comment = models.CharField(max_length=255,
                                verbose_name="Comments",
                                default="None",
-                               blank=True)
+                               blank=True) # allow blank
 
 
     def __str__(self):
@@ -131,7 +129,7 @@ class Bet(models.Model):
     # type of bet
     betType = models.ForeignKey(BetType,
                                 on_delete=models.CASCADE,
-                                verbose_name="Bet Type")
+                                verbose_name="Type")
 
     # site in which bet is placed
     site = models.ForeignKey(Site,
@@ -193,7 +191,7 @@ class Transaction(models.Model):
         decimal_places=2,
         blank=False,
         default=10.0,
-        verbose_name="Balance Adjust")
+        verbose_name="Balance Adjust pls")
 
     # transaction date
     date = models.fields.DateField(

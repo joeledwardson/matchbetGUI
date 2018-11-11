@@ -7,6 +7,7 @@ from .sessions import get_last_view, set_last_view
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
+from django.utils.text import slugify
 
 from itertools import chain
 
@@ -22,7 +23,10 @@ view_site = create_common_view(Site)
 # override object link (by default is update) to go to sitelog, add site name as url var
 view_site.get_object_link = lambda self, site: reverse(
     viewname_app(sitelog_view_name),
-    kwargs={sitelog_site_var: site.name})
+    kwargs={
+        'pk': site.pk,
+        sitelog_site_var: slugify(site.name),
+    })
 views_site = {'default': view_site, 'update': create_update_vew(Site)}
 
 # Match View

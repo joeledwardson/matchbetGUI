@@ -1,13 +1,13 @@
 {# pass log as list of text lines [log_lines], update option string [log_update] #}
 
 <div>
-    {% for l in log.lines %}
+    {% for l in view.log.lines %}
 
     {# first line - check if message was info (success, green) or error, red #}
     <div
         {% if forloop.first %}class=
-        {% if log.status == 1 %}"fadegreen"
-        {% elif log.status == 2 %}"fadered"
+        {% if view.log.status == 1 %}"fadegreen"
+        {% elif view.log.status == 2 %}"fadered"
         {% else %}""
         {% endif %}
         {% endif %}>

@@ -5,7 +5,6 @@ from .names import _append_success
 from .views import view_classes
 from .mysitelogview import sitelog_view_dict
 
-
 app_name = BetlogConfig.name
 
 def path_constructor(view):
@@ -14,10 +13,10 @@ def path_constructor(view):
     url_vars = 'url_vars'
 
     name = view[default].view_name
-    mk_url_vars = lambda url_vars: ''.join('<{}:{}>/'.format(v['type'], v['name']) for v in url_vars)
-    get_url_vars = lambda view: mk_url_vars(view[url_vars] if url_vars in view else '')
+    mk_url_vars = lambda url_vars: ''.join(r'<{}:{}>/'.format(url_vars[v], v) for v in url_vars)
+    get_url_vars = lambda view: mk_url_vars(view[url_vars] if url_vars in view else r'')
 
-    path_list =  [
+    path_list = [
         path('{}/{}'.format(name, get_url_vars(view)),
              view=view[default].as_view(log_status=0),
              name=name),

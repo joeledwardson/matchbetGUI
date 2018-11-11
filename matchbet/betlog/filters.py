@@ -7,7 +7,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from .names import css_date_class, numeric_fields, css_select_class
 
-# by default no select boolean widget displays 'Uknown' - use blank text for no selection
+
+class MySelectorWidget(widgets.Select):
+    def __init__(self):
+        super().__init__(attrs={'class': css_select_class})
+
+# by default no select boolean widget displays 'Unknown' - use blank text for no selection
 class FriendlyBooleanWidget(filter_widgets.BooleanWidget):
     def __init__(self, attrs):
         choices = (('', _('')),
@@ -18,12 +23,14 @@ class FriendlyBooleanWidget(filter_widgets.BooleanWidget):
         return forms.Select.__init__(self, attrs=attrs, choices=choices)
 
 
+
 # list of filter dicts
-#   name - name of filter you want to manually refer to it
-#   fields - model fields to match against
-#   filter - filter to create
-#   widget - widget to create
-#   attrs - widget attrs
+#   key - name of filter you want to manually refer to it
+#   value (dict)
+#       fields - model fields to match against
+#       filter - filter to create
+#       widget - widget to create
+#       attrs - widget attrs
 filters = {
     'model_selector': {
         'fields': [models.ForeignKey],
@@ -57,21 +64,35 @@ filters = {
 
 
 # create filter class based on model
-def create_filter(model_fields, model_name):
+#   model_fields - list of fields, filters will be created upon type
+#   view_name - name to use when creating class
+#   custom_fields - dict of custom field mappings
+#       key - name of field in [model_fields] to map
+#       value - search in [filters] global dict to find filter with equal [name] to use
+def create_filter(model_fields, view_name, custom_fields={}):
 
     # first set name of class to create
-    cls_name = 'Filter_{}'.format(model_name)
+    cls_name = 'Filter_{}'.format(view_name)
 
     # create dictionary to store class variables
-    cls_dict = {}
+    cls_dict = custom_fields
 
     # map model fields to filter if filter is required
-    fields = {
-        field:filters[filt]
-        for field in model_fields
-        for filt in filters
-        if type(field) in filters[filt]['fields']
-    }
+    fields = {}
+    model_field_names = [f.name for f in model_fields]
+    for field in model_fields:
+        # if field.name in custom_fields:
+        #     fields.update({
+        #         field: filters[custom_fields[field.name]]
+        #     })
+        # else:
+        try:
+            f = next({field: filters[filt]} for filt in filters if type(field) in filters[filt]['fields'])
+            fields.update(f)
+        except StopIteration:
+            pass
+
+
 
     # loop fields
     for f in fields:
@@ -100,13 +121,8 @@ def create_filter(model_fields, model_name):
         # create filter instance itself and add to class dictionary
         cls_dict[f.name] = form_filter['filter'](**filter_dict)
 
-    class MySelectorWidget(widgets.Select):
-        def __init__(self):
-            super().__init__(attrs={'class': css_select_class})
-
-
     cls_dict['o'] = django_filters.OrderingFilter(
-        fields=list(
+        choices=list(
             (f.name, f.verbose_name) for f in model_fields
         ),
         widget=MySelectorWidget,

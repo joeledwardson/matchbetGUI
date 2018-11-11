@@ -1,5 +1,12 @@
 from .log import server_logger, log_path, get_log, get_log_recent
 import logging
+from os.path import exists
+
+
+# create file if not exists
+if not exists(log_path):
+    with open(log_path, 'w') as f:
+        pass
 
 # create file handler
 fh = logging.FileHandler(log_path)
