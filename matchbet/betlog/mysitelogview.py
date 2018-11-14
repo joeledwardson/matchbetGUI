@@ -2,18 +2,17 @@ from django.views.generic.base import TemplateView
 from django.shortcuts import get_object_or_404
 from django.db.models import F
 from django.db.models import CharField
-from django.db.models import QuerySet
 from itertools import chain
 from operator import attrgetter
 import django_filters
 
 from .models import Transaction, Bet, fieldnames_all, fields_all, Site, TransactionType, BetType
-from .names import get_field_name
 from .filters import create_filter
 from .mytableview import table_view_class, css_good_type, css_bad_type
 from .mylogview import LogView
 from .sessions import set_last_view
 from .filters import MySelectorWidget
+from .filters import SliderWidget
 
 # custom view name - normally based on model
 sitelog_view_name = 'sitelog'
@@ -56,14 +55,16 @@ fields += [
 # create table view
 table_view = table_view_class(fields, sitelog_view_name)
 
+type_name = lambda type_field: '{}__name'.format(type_field)
 
-# filter class - add custom field for object type
-sitelog_filter = create_filter(fields, sitelog_view_name, {
-    transactionTypeField: django_filters.ChoiceFilter(
+create_sitelog_filter = lambda typeFieldName: create_filter(fields, sitelog_view_name, {
+    objectType.name: django_filters.ChoiceFilter(
+        label='Type',
+        field_name=type_name(typeFieldName),
         choices=objectType.choices,
-        widget=MySelectorWidget)
+        widget=MySelectorWidget
+    ),
 })
-
 
 class SiteLogView(table_view, LogView):
 
@@ -72,44 +73,15 @@ class SiteLogView(table_view, LogView):
     template_name = 'sitelog.html' # custom template - does not use create form (is added by default)
     title = None # add friendly display title to context (otherwise will use Sitelog - not very nice to look at!
     site_name = None # name of site to set in get function
-    filter_class = sitelog_filter
+
+    # transaction filter class
+    Filter_transaction = create_sitelog_filter(transactionTypeField)
+    # bet filter class
+    Filter_bet = create_sitelog_filter(betTypeField)
 
     # override table get queryset function - return Transaction and Bet joined list
     def get_table_qs(self):
 
-        # # filter to site by its name
-        # site_filter = {siteFieldName: self.site}
-        #
-        # # transaction annotation query
-        # query_t = {objectType.name: F('{}__name'.format(transactionTypeField))}
-        #
-        # # filter transactions by site name
-        # filtered_t = Transaction._default_manager.filter(**site_filter)
-        # #
-        # # # transaction annotated queryset
-        # # qs_t = filtered_t.annotate(**query_t)
-        # #
-        # # qs_t = self.filter_class(get,
-        # #                          queryset=Transaction._default_manager.filter(**site_filter))
-        #
-        # # bet annotation query
-        # query_b = {objectType.name: F('{}__name'.format(betTypeField))}
-        #
-        # # filter bets by site name
-        # filtered_b = Bet._default_manager.filter(**site_filter)
-        #
-        # print(filtered_b)
-        #
-        # # bet annotated queryset
-        # qs_b = filtered_b.annotate(**query_b)
-        #
-        #
-        # # join queryset together and order by date (inverted so newest first)
-        # return sorted(
-        #     chain(qs_t, qs_b),
-        #     key=attrgetter('date'),
-        #     reverse=True
-        # )
         return self.qs
 
     def get_context_data(self, **kwargs):
@@ -125,6 +97,59 @@ class SiteLogView(table_view, LogView):
 
         return context
 
+
+    # get queryset of a model, filtered using field with name [siteFieldName] i.e. 'site' to [site] object
+    def get_qs(self, model, site):
+
+        # filter to site by the [site] object stored in class
+        site_filter = {siteFieldName: site}
+
+        # return filtered queryset to site object
+        return model.objects.filter(**site_filter)
+
+
+    # get django fitler instance queryset, filtered with parameters in [get]
+    def get_filter_instance(self, GET_dict, model, site, Filter_class):
+
+        # retrieve queryset filtered by site
+        qs = self.get_qs(model, site)
+
+        # create and return fitler instance
+        # if objectType.name is in GET_dict, filter will use [field_name] to filter
+        return Filter_class(GET_dict, queryset=qs)
+
+
+    # annotate a queryset with a type field to objectType
+    # e.g. queryset with 'transactionType__name' would be annotated to 'object_type'
+    def annotate(self, qs, typeFieldName):
+
+        # create annotation dictionary
+        d = {objectType.name: F('{}__name'.format(typeFieldName))}
+
+        # return annotated queryset
+        return qs.annotate(**d)
+
+    # join queryset list together and order them
+    def order_querysets(self, qs_list, order_by, order_default):
+
+        # if order by parameter is empty, use default order by
+        if not order_by:
+            order_by = order_default
+
+        # '-' indicates reversed, however database are printed top to bottom so invert boolean
+        order_reversed = not(order_by.startswith('-'))
+
+        # remove '-', then can use getattr() to retrieve field
+        order_by = order_by.strip('-')
+
+        # sort list of pointers to querysets, using getattr of [order_by] parameter
+        return sorted(
+            chain(*qs_list),
+            key=attrgetter(order_by),
+            reverse=order_reversed
+        )
+
+    @set_last_view
     def get(self, request, *args, **kwargs):
 
         # get site from GET in url
@@ -132,68 +157,25 @@ class SiteLogView(table_view, LogView):
         # assign to self
         self.site = site
 
-        # set view key word args
+        # set view key word args - read by set_last_view_wrap
         self.view_kwargs = {sitelog_site_var: site.name, 'pk': site.pk}
 
         # set page title with site name
         self.title = '{} log'.format(site.name)
 
-        # filter to site by its name
-        site_filter = {siteFieldName: self.site}
+        # create transaction and bet filter instances
+        filter_transaction = self.get_filter_instance(request.GET, Transaction, site, self.Filter_transaction)
+        filter_bet = self.get_filter_instance(request.GET, Bet, site, self.Filter_bet)
 
-        get_dict = request.GET.copy()
+        # annotate filter querysets so they have matching 'object_type' values
+        qs_list = [self.annotate(filter_transaction.qs, transactionTypeField),
+                   self.annotate(filter_bet.qs, betTypeField)]
 
-        type_name = lambda type_field: '{}__name'.format(type_field)
+        # order querysets using order 'o' parameter, assign to class so can be read by get_table_qs()
+        self.qs = self.order_querysets(qs_list, order_by=request.GET.get('o'), order_default='date')
 
-        qs_t = Transaction.objects.filter(**site_filter)
-        qs_b = Bet.objects.filter(**site_filter)
-
-        # copy transaction type to bet type for filtering
-        t = get_dict.get(transactionTypeField)
-        if t:
-            filter_dict = {type_name(transactionTypeField): t}
-            qs_t = qs_t.filter(**filter_dict)
-
-            filter_dict = {type_name(betTypeField): t}
-            qs_b = qs_b.filter(**filter_dict)
-
-            get_dict.pop(transactionTypeField)
-
-        def get_filter(qs):
-            return self.filter_class(get_dict,
-                                     queryset=qs)
-
-        filter_transaction = get_filter(qs_t)
-        filter_bet = get_filter(qs_b)
-
-        def annotate(qs, type_field):
-            # qs = model._default_manager.filter(**site_filter)
-            annotation = {objectType.name: F('{}__name'.format(type_field))}
-            return qs.annotate(**annotation)
-
-        # qs_t = filter_transaction.qs
-        qs_t = annotate(filter_transaction.qs, transactionTypeField)
-        qs_b = annotate(filter_bet.qs, betTypeField)
-
-        order_by = get_dict.get('o') or 'date'
-        # if order_by:
-        #     order_reversed = not(order_by.startswith('-'))
-        #     order_by.strip('-')
-        # else:
-        #     order_reversed = True
-        #     order_by = 'date'
-
-        # join queryset together and order by date (inverted so newest first)
-        self.qs = sorted(
-            chain(qs_t, qs_b),
-            key=attrgetter(order_by),
-            reverse=True
-        )
-
+        # assign transaction filter to class value for reading by template (choice between transaction/bet is arbitrary)
         self.filter = filter_transaction
-
-        # update view name history
-        set_last_view(request, self.view_name, self.view_kwargs)
 
         return super().get(request, *args, **kwargs)
 

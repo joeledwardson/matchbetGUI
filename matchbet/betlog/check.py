@@ -2,7 +2,7 @@ from .models import TransactionType, BetType
 from functools import reduce
 import operator
 from django.db.models import Q
-from .views import model_viewname
+from .names import model_viewname
 
 model_types = {
     TransactionType: ['Deposit', 'Withdraw', 'Fee'],

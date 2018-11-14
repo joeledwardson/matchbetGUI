@@ -11,7 +11,7 @@ log_name = 'bet_server.log'
 if platform.system() == 'Windows':
     log_path = '{}\{}'.format(Path.home(), log_name)
 elif platform.system() in ['Linux', 'Ubuntu']:
-    log_path = '/var/log/{}'.format(log_name)
+    log_path = '/home/pi/matchbet/{}'.format(log_name)
 else:
     raise Exception('platform "{}" not recognised'.format(platform.system()))
 

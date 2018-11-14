@@ -1,3 +1,86 @@
+
+# get_dict = request.GET.copy()
+# # filter to site by the [site] object stored in class
+# site_filter = {siteFieldName: site}
+#
+#
+# qs_t = Transaction.objects.filter(**site_filter)
+# qs_b = Bet.objects.filter(**site_filter)
+#
+# # copy transaction type to bet type for filtering
+# t = get_dict.get(objectType.name)
+# if t:
+#     filter_dict = {type_name(transactionTypeField): t}
+#     qs_t = qs_t.filter(**filter_dict)
+#
+#     filter_dict = {type_name(betTypeField): t}
+#     qs_b = qs_b.filter(**filter_dict)
+#
+#     get_dict.pop(transactionTypeField)
+#
+# def get_filter(qs):
+#     return self.filter_class(get_dict,
+#                              queryset=qs)
+#
+# filter_transaction = get_filter(qs_t)
+# filter_bet = get_filter(qs_b)
+#
+# def annotate(qs, type_field):
+#     # qs = model._default_manager.filter(**site_filter)
+#     annotation = {objectType.name: F('{}__name'.format(type_field))}
+#     return qs.annotate(**annotation)
+#
+# # qs_t = filter_transaction.qs
+# qs_t = annotate(filter_transaction.qs, transactionTypeField)
+# qs_b = annotate(filter_bet.qs, betTypeField)
+#
+# order_by = get_dict.get('o') or 'date'
+# # if order_by:
+# #     order_reversed = not(order_by.startswith('-'))
+# #     order_by.strip('-')
+# # else:
+# #     order_reversed = True
+# #     order_by = 'date'
+#
+# # join queryset together and order by date (inverted so newest first)
+# self.qs = sorted(
+#     chain(qs_t, qs_b),
+#     key=attrgetter(order_by),
+#     reverse=True
+# )
+# # filter to site by its name
+# site_filter = {siteFieldName: self.site}
+#
+# # transaction annotation query
+# query_t = {objectType.name: F('{}__name'.format(transactionTypeField))}
+#
+# # filter transactions by site name
+# filtered_t = Transaction._default_manager.filter(**site_filter)
+# #
+# # # transaction annotated queryset
+# # qs_t = filtered_t.annotate(**query_t)
+# #
+# # qs_t = self.filter_class(get,
+# #                          queryset=Transaction._default_manager.filter(**site_filter))
+#
+# # bet annotation query
+# query_b = {objectType.name: F('{}__name'.format(betTypeField))}
+#
+# # filter bets by site name
+# filtered_b = Bet._default_manager.filter(**site_filter)
+#
+# print(filtered_b)
+#
+# # bet annotated queryset
+# qs_b = filtered_b.annotate(**query_b)
+#
+#
+# # join queryset together and order by date (inverted so newest first)
+# return sorted(
+#     chain(qs_t, qs_b),
+#     key=attrgetter('date'),
+#     reverse=True
+# )
 # # determine if instance is of django money type
 # @register.filter
 # def is_money_field(field_string):

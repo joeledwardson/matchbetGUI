@@ -51,17 +51,13 @@ def default_view(request):
 view_classes = [views_site, views_transaction, views_bet, views_match]
 
 
-# override get function
+# override get function - need to set last view first
+@set_last_view
 def get(self, request, *args, **kwargs):
 
-    # get page response
-    page = super(type(self), self).get(request, *args, **kwargs)
+    # return page response
+    return super(type(self), self).get(request, *args, **kwargs)
 
-    # set current view for next page
-    set_last_view(request, self.view_name)
-
-
-    return page
 
 # set get function for all default classes (not updates or last view will be overriden!)
 for view_dict in view_classes:

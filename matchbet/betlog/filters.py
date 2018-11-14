@@ -5,7 +5,7 @@ from django.db import models
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .names import css_date_class, numeric_fields, css_select_class
+from .names import css_date_class, numeric_fields, css_select_class, css_checkbox_class
 
 
 class MySelectorWidget(widgets.Select):
@@ -22,7 +22,9 @@ class FriendlyBooleanWidget(filter_widgets.BooleanWidget):
         # skip BooleanWidget init and go straight to Choice widget super - override choices
         return forms.Select.__init__(self, attrs=attrs, choices=choices)
 
-
+class SliderWidget(widgets.CheckboxInput):
+    def __init__(self):
+        super().__init__(attrs={'class': css_checkbox_class})
 
 # list of filter dicts
 #   key - name of filter you want to manually refer to it
@@ -66,33 +68,23 @@ filters = {
 # create filter class based on model
 #   model_fields - list of fields, filters will be created upon type
 #   view_name - name to use when creating class
-#   custom_fields - dict of custom field mappings
-#       key - name of field in [model_fields] to map
-#       value - search in [filters] global dict to find filter with equal [name] to use
+#   custom_fields - dict of custom field filters
 def create_filter(model_fields, view_name, custom_fields={}):
 
     # first set name of class to create
     cls_name = 'Filter_{}'.format(view_name)
 
-    # create dictionary to store class variables
+    # create class dictionary - intial values are custom field filters
     cls_dict = custom_fields
 
     # map model fields to filter if filter is required
     fields = {}
-    model_field_names = [f.name for f in model_fields]
     for field in model_fields:
-        # if field.name in custom_fields:
-        #     fields.update({
-        #         field: filters[custom_fields[field.name]]
-        #     })
-        # else:
         try:
             f = next({field: filters[filt]} for filt in filters if type(field) in filters[filt]['fields'])
             fields.update(f)
         except StopIteration:
             pass
-
-
 
     # loop fields
     for f in fields:

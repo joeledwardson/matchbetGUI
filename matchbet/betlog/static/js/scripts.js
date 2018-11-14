@@ -22,6 +22,11 @@ function set_toggler_button( obj, visible ) {
 // wait until document has completely loaded
 $(document).ready(function(){
 
+    // loop check box class elements
+    $('.class-checkbox').each(function(i, obj) {
+        $( obj ).toggleSwitch();
+    })
+
     // loop button toggler class elements
     $('.btn-toggler').each(function(i, obj) {
         // set text value based on target visibility
@@ -29,7 +34,7 @@ $(document).ready(function(){
     });
 
     // loop each selector element
-    $('.class-selector').each(function(i, obj){
+    $('.class-selector, .select').each(function(i, obj){
 
         $( obj ).select2({
             placeholder: "", // by default display nothing
@@ -38,7 +43,7 @@ $(document).ready(function(){
         });
     });
 
-    $('.class-selector').on('select2:unselecting', function() {
+    $('.class-selector, .select').on('select2:unselecting', function() {
 
         // user has de-selected option - set custom data value
         $(this).data('is_deselecting', true);

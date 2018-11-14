@@ -23,6 +23,8 @@ Inputs:
 
 {# cancel button to return to standard list #}
 {% block form_buttons %}
-<input type="submit" value="Submit">
-<a href="{% get_url view.from_viewname view.from_view_kwargs %}"><input type="button" value="Cancel"></a>
+<input type="submit" class="{% button_classes %}" value="Submit">
+<a href="{% get_url view.from_viewname view.from_view_kwargs %}">
+    <input type="button"class="{% button_classes %}" value="Cancel">
+</a>
 {% endblock %}

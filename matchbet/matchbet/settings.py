@@ -30,7 +30,7 @@ SECRET_KEY = '&d&=u8y&4ptu=lo=@ky)xb#c%j2mw5d4@e^(iy+b8n0%w8t1#^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'mbet',
         'USER': 'user',
         'PASSWORD': 'password',
-        'HOST': '192.168.0.202',
+        'HOST': '192.168.1.202',
         'PORT': '33338'
     }
 }

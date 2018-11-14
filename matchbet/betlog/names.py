@@ -1,6 +1,7 @@
 from .apps import BetlogConfig
 from django.db.models import fields
 
+css_checkbox_class = 'class-checkbox'
 css_select_class = 'class-selector'
 css_date_class = 'class-date-picker'
 css_time_class = 'class-time-picker'
