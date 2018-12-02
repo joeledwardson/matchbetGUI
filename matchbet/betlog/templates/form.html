@@ -1,0 +1,72 @@
+{# pass django Models.Forms as [form] to this to render post/update form #}
+{% load crispy_forms_tags %}
+{% load templatefunctions %}
+
+{% comment %}
+Inputs:
+    form_url - url to request
+    form_title - title to display
+
+Input defaults
+    form - form to display (set by any django FormView)
+    form_div_id - id of containing div (default is 'formdiv')
+    form_content_id - id of form inside (default is 'formcontent')
+
+blocks:
+    form_div_classes - default is 'modal fade'
+    form_method - default is post
+    form_hide - default is true
+    form_head - default uses form_title with close x symbol
+    form_body - default uses form
+    form_buttons - default is Submit and Cancel (to close)
+    form_extra_buttons - default is empty, use for more buttons if you wish
+    form_bottom - default empty
+
+
+{% endcomment %}
+
+
+{# can put extra info at top of form here #}
+{% block form_top %}{% endblock %}
+
+
+<div class="{% block form_div_classes %}modal fade{% endblock %}" id="{{ form_div_id|default:'formdiv' }}" tabindex="-1"
+     role="dialog" aria-hidden="{% block form_hide %}true{% endblock %}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                {% block form_head %}
+                <h4 class="modal-title w-100 font-weight-bold">{{ form_title }}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {% endblock %}
+            </div>
+
+            <form method="{% block form_method %}post{% endblock %}" action="{{ form_url }}" id="{{ form_content_id|default:'formcontent' }}">
+
+                {% csrf_token %}
+                <div class="modal-body mx-3">
+                    {% block form_body %}
+                        {{ form|crispy }}
+                    {% endblock %}
+
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    {% block form_buttons %}
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    {% endblock %}
+                    {% block form_extra_buttons %}{% endblock %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+{# can put extra info at bottom of form here #}
+{% block form_bottom %}{% endblock %}

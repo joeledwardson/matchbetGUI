@@ -1,0 +1,25 @@
+2018-11-23 23:01:22,166 - INFO - New site "Just another one" added
+2018-11-23 23:01:39,054 - INFO - New bet "Loss £5.00 on match "14 Nov, 18: Arsenal vs Tottenham" using site Just another one on 2018-11-23 23:01:00+00:00" added
+2018-11-24 15:24:05,944 - INFO - transaction "Site Bet365: Deposit £10.00" updated to "Site Bet365: Deposit £10.00"
+2018-11-24 15:44:09,768 - INFO - transaction "Site Bet365: Deposit £10.00" updated to "Site Bet365: Deposit £10.00"
+2018-11-24 15:44:23,532 - INFO - transaction "Site Bet365: Withdraw £5.00" updated to "Site Bet365: Withdraw £5.00"
+2018-11-24 15:52:15,951 - INFO - transaction "Site Williamshill: Deposit £20.00" updated to "Site Williamshill: Deposit £20.00"
+2018-11-24 16:02:24,122 - INFO - New transaction "Site Bet365: Fee £3.56" added
+2018-11-25 10:39:09,672 - INFO - New transaction "Site Just another one: Deposit £15.00" added
+2018-11-25 11:43:45,924 - INFO - New Match added: 25 Nov, 18: Chelsea vs Man United
+2018-11-25 21:49:30,714 - INFO - Transaction Site Williamshill: Deposit £20.00 updated to Site Williamshill: Deposit £25.00
+2018-11-25 21:49:37,195 - INFO - Successfully deleted <class 'betlog.models.Transaction'>: Site Bet365: Fee £3.56
+2018-11-25 21:53:09,019 - ERROR - You cannot delete a Transaction
+2018-11-25 21:55:35,449 - INFO - Transaction Site Just another one: Deposit £15.00 updated to Site Just another one: Deposit £15.00
+2018-11-25 21:55:43,067 - INFO - Transaction Site Just another one: Deposit £15.00 updated to Site Just another one: Deposit £17.50
+2018-11-25 21:57:54,647 - INFO - Successfully deleted Bet: Win £5.00 on 14 Nov, 18: Arsenal vs Tottenham - Bet365. 2018-11-14 00:00:00+00:00
+2018-11-25 22:00:46,287 - INFO - Successfully deleted Bet: Back bet £5.00 on 14 Nov, 18: Arsenal vs Tottenham - Bet365. 2018-11-14 00:00:00+00:00
+2018-11-25 22:07:27,276 - INFO - Successfully deleted Bet: Loss £5.00 on 14 Nov, 18: Arsenal vs Tottenham - Just another one. 2018-11-23 23:01:00+00:00
+2018-11-25 22:21:37,680 - INFO - Successfully deleted Transaction: Site Just another one: Deposit £17.50
+2018-11-25 22:21:52,914 - INFO - New Transaction added: Site Just another one: Deposit £12.50
+2018-11-25 22:23:31,325 - INFO - Successfully deleted Transaction: Site Williamshill: Deposit £25.00
+2018-11-28 19:36:33,960 - INFO - New Transaction added: Site Just another one: Fee £10.00
+2018-11-28 22:43:54,459 - INFO - New Transaction added: Site Just another one: Fee £10.00
+2018-11-29 20:59:11,863 - INFO - New Transaction added: Site Bet365: Deposit £12.50
+2018-11-29 21:00:50,170 - INFO - New Transaction added: Site Bet365: Deposit £10.00
+2018-11-29 21:18:28,757 - INFO - New Transaction added: Site Williamshill: Withdraw £10.00

@@ -1,0 +1,13 @@
+{% extends "form.html" %}
+
+<!-- extra button which clears filter_instances goes to normal url -->
+{% block form_extra_buttons %}
+<a href="{{ form_url }}">
+    <input type="button"class="btn btn-default" value="Clear">
+</a>
+{% endblock %}
+
+{% block form_method %}get{% endblock %}
+
+
+

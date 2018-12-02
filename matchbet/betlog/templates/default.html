@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+    {% load templatefunctions %}
+    {% include "head.html" %}
+
+
+
+
+    <body>
+        <div class="container">
+
+            <!-- page navigation -->
+            {% block nav %}
+            {% include "nav.html" %}
+            {% endblock %}
+            <br>
+
+            <!-- top bar - title and buttons -->
+            <div class="container-fluid">
+                <div class="row align-items-center h-100">
+                    <!-- title -->
+                    <div class="col">
+                        <h3>
+                            {% block title %}
+                            {{ view|title }}
+                            {% endblock %}
+                        </h3>
+                    </div>
+
+                    <!-- filter -->
+                    <div class="col-md-auto">
+                        <button type="button" class="btn btn-raised"
+                        data-toggle="modal" data-target="#filterform">
+                            <!-- fa-fw adds fixed width, which also adds a space -->
+                            Filter<i class="fas fa-fw fa-filter"></i>
+                        </button>
+                    </div>
+
+                    <!-- new object -->
+                    <div class="col-md-auto">
+                        {% block new_buttons %}
+                        <button type="button" class="btn btn-raised"
+                        data-toggle="modal" data-target="#formdiv">New<i class="fas fa-fw fa-plus"></i></button>
+                        {% endblock %}
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- get form variables -->
+            {# form_url is form's post url #}
+            {% get_url view.view_name view.view_kwargs as form_url %}
+
+
+
+            <!-- new model form (hidden) -->
+            {% block form_new %}
+            {% add_str "New " view.model|get_model_name as form_title %}
+
+            {% include "form.html" %}
+            {% endblock %}
+
+            <!-- filter form (hidden) -->
+            {% block form_filter %}
+            {# set form variable and container, form IDs - must be different to new form! #}
+            {% with form_title="Filter" form=view.filter.form form_div_id="filterform" form_content_id="filtercontent" %}
+
+            {% include "formfilter.html"  %}
+            {% endwith %}
+            {% endblock %}
+
+
+            {# page break #}
+            <hr>
+
+            {# show datbase table - user filter queryset in context #}
+            {% include "table.html" %}
+            <br>
+
+            {# show log at bottom #}
+            {% include "log.html" %}
+
+
+        </div>
+
+
+    </body>
+
+</html>

@@ -1,0 +1,81 @@
+/* animation to fade from green to blank */
+@keyframes animation_fade_green {
+    from {background-color: green;}
+    to {background-color: none;}
+}
+
+/* animation to fade from red to blank */
+@keyframes animation_fade_red {
+    from {background-color: red;}
+    to {background-color: none;}
+}
+
+/* class to fade from green to blank in 5 seconds */
+.fadegreen {
+    animation-name: animation_fade_green;
+    animation-duration: 5s;
+}
+
+/* class to fade from red to blank in 5 seconds */
+.fadered, .errorlist {
+    animation-name: animation_fade_red;
+    animation-duration: 5s;
+    list-style: none;
+    padding-left: 0px;
+}
+
+.class-date-picker, .ui-datepicker-trigger {
+    vertical-align: middle;
+    margin: 2px;
+}
+
+.row-green {
+    background-color: rgb(169, 229, 158);
+}
+
+.row-red {
+    background-color: rgb(229, 169, 158);
+ }
+
+.row-link:hover {
+    cursor: pointer;
+    background-color: #ffff99;
+}
+
+#navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #e7e7e7;
+    background-color: #f3f3f3;
+}
+
+#navbar li {
+    float: left;
+}
+
+#navbar li a {
+    display: block;
+    color: #666;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#navbar li a:hover {
+    background-color: #ddd;
+}
+
+.modal-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+
+}
+
+.no-gutters {
+    margin-left: 0;
+    margin-right: 0;
+}
