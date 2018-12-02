@@ -1,15 +1,13 @@
 import logging
-import platform
-from pathlib import Path
+from matchbet.settings import BASE_DIR
 
-import os
 
 # logger instance
 server_logger = logging.getLogger('server_logger')
 
 log_name = 'bet_server.log'
 
-log_path = '{}/{}'.format(os.getcwd(), log_name)
+log_path = '{}/{}'.format(BASE_DIR, log_name)
 
 
 # retrieve all log messages
