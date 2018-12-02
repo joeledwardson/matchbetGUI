@@ -37,9 +37,9 @@
     background-color: rgb(229, 169, 158);
  }
 
-
 .row-link:hover {
     cursor: pointer;
+    background-color: #ffff99;
 }
 
 #navbar {
@@ -65,4 +65,17 @@
 
 #navbar li a:hover {
     background-color: #ddd;
+}
+
+.modal-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+
+}
+
+.no-gutters {
+    margin-left: 0;
+    margin-right: 0;
 }

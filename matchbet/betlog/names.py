@@ -1,19 +1,31 @@
-from .apps import BetlogConfig
 from django.db.models import fields
 
-css_checkbox_class = 'class-checkbox'
-css_select_class = 'class-selector'
-css_date_class = 'class-date-picker'
-css_time_class = 'class-time-picker'
-date_format = 'dd-mm-yyyy'
+from .apps import BetlogConfig
+from .models import MyMoneyField
 
-numeric_fields = [fields.IntegerField, fields.DecimalField, fields.FloatField]
+numeric_fields = (
+    fields.IntegerField,
+    fields.DecimalField,
+    fields.FloatField,
+    MyMoneyField
+)
 
+date_fields = (
+    fields.DateTimeField,
+    fields.DateField
+)
 
-# ONLY applicable to this scope!
-# create a view name from a django model
+# view name of a django model - get stripped, capitalised, verbose (plural) name
 def model_viewname(model):
     return model._meta.verbose_name_plural.capitalize().strip()
+
+# name of a django model - get stripped capitalised verbose (singular) name
+def model_name(model):
+    return model._meta.verbose_name.capitalize().strip()
+
+# create a delete view name from a django model
+def model_delete_viewname(model):
+    return '{}_delete'.format(model_viewname(model))
 
 # create an update view name from a django model
 def model_update_viewname(model):

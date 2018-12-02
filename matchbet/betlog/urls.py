@@ -2,8 +2,11 @@ from django.urls import path, re_path
 
 from .apps import BetlogConfig
 from .names import _append_success
-from .views import view_classes
-from .mysitelogview import sitelog_view_dict
+from .views.views import view_classes
+from betlog.views.sitelog.sitelog import sitelog_view_dict
+
+from djmoney.admin import setup_admin_integration
+setup_admin_integration()
 
 app_name = BetlogConfig.name
 
@@ -30,14 +33,16 @@ def path_constructor(view):
              name=_append_success(name, False))]
 
     if update in view:
-        updateName = view[update].view_name
 
-        match_str = r'^{name}/update/id-(?P<pk>\d+)/$'.format(name=name)
+        update_view_name = view[update].view_name
+
+        match_str = r'^{view_name}/update/id-(?P<pk>\d+)/$'.format(view_name=name)
 
         path_list.append(re_path(
             match_str,
             view=view[update].as_view(),
-            name=updateName))
+            name=update_view_name
+        ))
 
     return path_list
 
@@ -50,8 +55,3 @@ def path_constructor(view):
 # /? specifies optional forward slash
 urlpatterns = [p for v in view_classes for p in path_constructor(v)]
 urlpatterns += path_constructor(sitelog_view_dict)
-
-# urlpatterns.append(path('test/', SiteLogView.as_view(), name=SiteLogView.view_name))
-# urlpatterns.append(path('index/', DefaultView.as_view(), name='index'))
-# urlpatterns.append(path('test/', TestView.as_view(), name=TestView.view_name))
-# urlpatterns.append(path('test/update/<pk>/', TestView.as_view(), name=append_update(TestView.view_name)))

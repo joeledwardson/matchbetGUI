@@ -4,7 +4,7 @@
 def set_last_view(get):
 
     # inner function to wrap around get
-    def set_last_view(self, request, *args, **kwargs):
+    def inner(self, request, *args, **kwargs):
 
         # first, get response (get function may need to set [view_kwargs])
         response = get(self, request, *args, **kwargs)
@@ -24,11 +24,10 @@ def set_last_view(get):
         return response
 
     # return inner function
-    return set_last_view
-
+    return inner
 
 # retrieve last view name
-def get_last_view(request):
+def get_last_view_name(request):
     return request.session.get('last_view')
 
 # retrieve last view kwargs (may return none)

@@ -2,18 +2,15 @@ import logging
 import platform
 from pathlib import Path
 
+import os
+
 # logger instance
 server_logger = logging.getLogger('server_logger')
 
 log_name = 'bet_server.log'
 
-# path to store log file
-if platform.system() == 'Windows':
-    log_path = '{}\{}'.format(Path.home(), log_name)
-elif platform.system() in ['Linux', 'Ubuntu']:
-    log_path = '/home/pi/matchbet/{}'.format(log_name)
-else:
-    raise Exception('platform "{}" not recognised'.format(platform.system()))
+log_path = '{}/{}'.format(os.getcwd(), log_name)
+
 
 # retrieve all log messages
 def get_log():

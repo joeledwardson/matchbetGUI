@@ -3,28 +3,33 @@
 
 {% comment %}
 Update an object
-Inputs:
-    form - django Models.Forms 
+
+Inputs (inherited from 'form.html'):
+    form_url - url to request
+    form_title - title to display
 {% endcomment %}
 
 
-
 {# include statics for datetime picker and css files #}
-{% block form_top %}{% include "getstatics.html" %}{% endblock %}
+{% block form_top %}
+{% include "head.html" %}
+{% endblock %}
 
-{# change form id #}
-{% block form_id %}form_update{% endblock %}
+{# dont use fade (default in classes) #}
+{% block form_div_classes %}container{% endblock %}
 
-{# action is post to current url (interpreted different as post) #}
-{% block form_action %}{{ view.my_url }}{% endblock %}
+{# need to show form default is hidden #}
+{% block form_hide %}False{% endblock %}
 
-{# need to show form! default is hidden #}
-{% block form_display %}block{% endblock %}
-
-{# cancel button to return to standard list #}
+{# cancel button to return to standard list (default closes form) #}
 {% block form_buttons %}
-<input type="submit" class="{% button_classes %}" value="Submit">
-<a href="{% get_url view.from_viewname view.from_view_kwargs %}">
-    <input type="button"class="{% button_classes %}" value="Cancel">
+<button type="submit" class="btn btn-success">Submit</button>
+<a href="{{ form_url }}">
+    <input type="button"class="btn btn-default" value="Cancel">
 </a>
+<input type="submit" name="delete_button" class="btn btn-warning" data-toggle="confirmation" value="Delete">
+{% endblock %}
+
+{% block form_bottom %}
+{# add anything at bottom here... #}
 {% endblock %}

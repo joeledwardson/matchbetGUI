@@ -3,11 +3,24 @@
 {# Retrieves view_classes from views and displays a link to each #}
 
 
-<ul id='navbar'>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     {% get_view_classes as views %}
-    {% for view in views %}
-    <li>
-        <a href="{% url view.view_name|v %}">{{ view|title }}</a>
-    </li>
-    {% endfor %}
-</ul>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        {% for view in views %}
+
+            <li class="nav-item ml-1 ">
+                <a class="nav-link" href="{% url view.view_name|v %}">{{ view|title }}</a>
+            </li>
+
+        {% endfor %}
+        </ul>
+
+
+
+    </div>
+</nav>

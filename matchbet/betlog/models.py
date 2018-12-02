@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils import timezone
-from django import forms
-from datetime import date, datetime
 from django.core.validators import RegexValidator
-import locale
+
+from moneyed.localization import format_money
+from moneyed import Money
+
 
 # *** Common structure
 # For classes to be to accesed from common functions in views_classes.py, form_classes.py they must contain [attributes_table] with a
@@ -13,8 +14,7 @@ import locale
 class MyMoneyField(models.DecimalField):
     @staticmethod
     def money_str(amount):
-        return locale.currency(amount,symbol=True,grouping=True)
-
+        return format_money(Money(amount, 'GBP'), locale='en_GB')
 
 # return all fields (not id, or any auto incrementing fields)
 # get all editable field names not id, (or any auto incrementing fields)
@@ -60,10 +60,10 @@ class Site(models.Model):
 
     # current balance - dependent on transactions
     balance = MyMoneyField(default=0,
-                           max_digits=14,
-                           decimal_places=2,
-                           verbose_name='Balance',
-                           editable=False)
+                         max_digits=14,
+                         decimal_places=2,
+                         verbose_name='Balance',
+                         editable=False)
 
     # number of current open bets
     openBets = models.IntegerField(default=0,
@@ -72,7 +72,7 @@ class Site(models.Model):
     # additional comments
     comment = models.CharField(max_length=255,
                                verbose_name="Comments",
-                               default="None",
+                               default="",
                                blank=True) # allow blank
 
 
@@ -156,12 +156,13 @@ class Bet(models.Model):
                                    blank=True)
 
     # date bet placed (not match complete!)
-    date = models.DateField(default=timezone.now,
-                            verbose_name="Date")
+    date = models.DateTimeField(default=timezone.now,
+                                verbose_name="Date",
+                                blank=False)
 
     # e.g. Lay Bet - 10 on arsenal vs chelsea on 12/10/2018
     def __str__(self):
-        return '{} {} on match "{}" using site {} on {}'.format(
+        return '{} {} on {} - {}. {}'.format(
             self.betType,
             MyMoneyField.money_str(abs(self.balanceAdjust)),
             self.match,
@@ -191,13 +192,14 @@ class Transaction(models.Model):
         decimal_places=2,
         blank=False,
         default=10.0,
-        verbose_name="Balance Adjust pls")
+        verbose_name="Balance Adjust")
 
     # transaction date
-    date = models.fields.DateField(
+    date = models.fields.DateTimeField(
         default=timezone.now,
         verbose_name="Date",
-        blank=False)
+        blank=False,
+    )
 
     # e.g. Desposit £10 to Bet365
     def __str__(self):

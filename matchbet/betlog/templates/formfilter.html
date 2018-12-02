@@ -1,37 +1,13 @@
 {% extends "form.html" %}
-{% load templatefunctions %}
 
-{% comment %}
-form view for filtering, hidden by default. 
-Inputs:
-    formfilter_id - html id of filter form
-{% endcomment %}
-
-
-
-{% block form_top %}
-<div>
-    <span>
-        <input
-            type="button"
-            class="btn-toggler {% button_classes %}"
-            target_id="{{ formfilter_id }}"
-            show_prompt="Filter"
-            hide_prompt="Hide">
-    </span>
-    <span>
-        <a href="{% get_url view.view_name view.view_kwargs %}">
-            <input type="button" value="Clear" class="{% button_classes %}">
-        </a>
-    </span>
-</div>
+<!-- extra button which clears filter_instances goes to normal url -->
+{% block form_extra_buttons %}
+<a href="{{ form_url }}">
+    <input type="button"class="btn btn-default" value="Clear">
+</a>
 {% endblock %}
 
-{% block form_method %}
-get
-{% endblock %}
+{% block form_method %}get{% endblock %}
 
 
-{# set form id #}
-{% block form_id %}{{ formfilter_id }}{% endblock %}
 

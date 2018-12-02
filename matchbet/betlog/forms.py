@@ -1,11 +1,10 @@
 from django.forms.models import ModelForm
-from django.db.models import Q, DateField, DateTimeField
+from django.db.models import Model, Q, DateField, DateTimeField, ForeignKey
 from django import forms
-from .models import Transaction, Bet, Site, Match, fieldnames_editable, fields_all
-from .names import css_date_class, css_time_class, numeric_fields
 from django.utils import timezone
 
-date_input = lambda: forms.DateInput(attrs={'class': css_date_class})
+from .models import Transaction, Bet, Site, Match, fieldnames_editable, fields_all
+from .widgets import DateTimeWidget, date_input, MySelectorWidget_NoClear
 
 
 # Negate numeric field if another (type) field requiers it
@@ -14,7 +13,7 @@ date_input = lambda: forms.DateInput(attrs={'class': css_date_class})
 # [form] is input form to pass.
 # [numeric_field] is field containing numeric value
 # [cls] is of type models.ForeignKey[cls] - specifies model sub-type and must be contained within the form
-# [filter_negatives] - filters applied to [cls]. checked against to see if negation is required
+# [filter_negatives] - filter_instances applied to [cls]. checked against to see if negation is required
 def negate_field(form, numeric_field, cls_name, filter_negatives):
     # first check number value inputted isn't negative
     if form.cleaned_data[numeric_field] < 0:
@@ -32,39 +31,16 @@ def negate_field(form, numeric_field, cls_name, filter_negatives):
         form.cleaned_data[numeric_field] = abs(form.cleaned_data[numeric_field]) * -1
 
 
-# custom date time split widget
-class DateTimeWidget(forms.MultiWidget):
-    def __init__(self, attrs=None):
-
-        # create two widgets - one for date one for time
-        splitWidgets = (
-            date_input(),
-            forms.TimeInput(format='%H:%M', attrs={'class': css_time_class})
-        )
-        # call super initialisation with widget list
-        super().__init__(splitWidgets, attrs)
-
-    # decompress - add date and time together
-    def decompress(self, value):
-        if value:
-            return [value.date(), value.time()]
-        return [None, None]
-
-    # from data dictionary - split widgets e.g. time_0, date_1 into list. return joined string
-    def value_from_datadict(self, data, files, name):
-        [date, time] = [widget.value_from_datadict(data, files, '{}_{}'.format(name, i))
-                        for i, widget in enumerate(self.widgets)]
-        return ' '.join([date, time])
-
 
 # return dictionary mapping of fields to custom widgets
-def custom_fields(field_list):
+def formatted_fields(field_list):
+
     w_dict = {
-        DateTimeField: forms.DateTimeField(widget=DateTimeWidget(), initial=timezone.now),
-        DateField: forms.DateField(widget=date_input(), initial=timezone.now)
+        DateTimeField: lambda field: forms.DateTimeField(widget=DateTimeWidget(), initial=timezone.now),
+        DateField: lambda field:    forms.DateField(widget=date_input(), initial=timezone.now),
     }
 
-    return {f.name:w_dict[type(f)] for f in field_list if type(f) in w_dict}
+    return {f.name:w_dict[type(f)](f) for f in field_list if type(f) in w_dict}
 
 
 # dictionary of model type: fields to display absolute value
@@ -74,7 +50,7 @@ absFields = {Transaction: ('balanceAdjust',), Bet: ('balanceAdjust',)}
 def form_init(self, *args, **kwargs):
 
     # call class super initialisation
-    me = ModelForm.__init__(self,*args, **kwargs)
+    ModelForm.__init__(self, *args, **kwargs)
 
     # check model is in dictionary
     if self.Meta.model in absFields:
@@ -88,22 +64,34 @@ def form_init(self, *args, **kwargs):
         # update initial dict
         self.initial.update(newValues)
 
-    return me
+def create_form_type(model_type: Model, custom_fields=None) -> ModelForm:
 
+    # set custom fields to empty dictionary if unused to prevent None errors
+    custom_fields = custom_fields or {}
 
-def create_form_type(model_type):
     # set form python name
     form_name = 'Form_{}'.format(model_type.__name__)
 
+    # get editable fields
+    field_names = fieldnames_editable(model_type)
+
     class Meta:
         model = model_type # required for form instansation
-        fields = fieldnames_editable(model_type)
+        fields = field_names
+        widgets = {
+            f.name: MySelectorWidget_NoClear
+            for f in fields_all(model_type)
+            if type(f) == ForeignKey and f.name not in custom_fields
+        }
 
     # create class dictionary - has Meta class and initialisation
     cls_dict = {'Meta': Meta, '__init__':form_init}
 
     # update class dictionary with customised field instances
-    cls_dict.update(custom_fields(fields_all(model_type)))
+    cls_dict.update(formatted_fields(fields_all(model_type)))
+
+    # update with custom inputted fields
+    cls_dict.update(custom_fields)
 
     cls = type(form_name, (ModelForm,), cls_dict)
     return cls

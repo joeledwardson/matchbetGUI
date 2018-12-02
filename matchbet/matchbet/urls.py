@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from betlog.views import default_view
+from betlog.views.views import default_view
 
 urlpatterns = [
     path('', default_view),

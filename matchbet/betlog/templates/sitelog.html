@@ -1,7 +1,23 @@
 {% extends "default.html" %}
+{% load templatefunctions %}
 
-{# don't use new form %}
-{% block form_new %}{% endblock %}
+{% block new_buttons %}
+    {% for f in form_data %}
+    <button type="button" class="btn btn-raised"
+    data-toggle="modal" data-target="#{{ f.name }}modal">{{ f.name }}<i class="fas fa-fw fa-plus"></i></button>
+    {% endfor %}
+{% endblock %}
 
-{# TODO - not using filter form #}
-{# {% block form_filter %}{% endblock %}#}
+{# use new transaction and bet form #}
+{% block form_new %}
+
+    {# no using view kwargs when going to generic model view #}
+
+    {% for f in form_data %}
+        {% add_str f.name "modal" as form_div_id %}
+        {% add_str f.name "content" as form_content_id %}
+
+        {% include "form.html" with form=f.form form_title=f.name form_url=f.url %}
+    {% endfor %}
+
+{% endblock %}
