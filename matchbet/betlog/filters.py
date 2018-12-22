@@ -35,7 +35,7 @@ filters = {
     },
     'numeric': {
         'fields': numeric_fields,
-        'filter': django_filters.NumericRangeFilter,
+        'filter': django_filters.RangeFilter, # doesn't work with numericrangefilter??
         'widget': filter_widgets.RangeWidget,
     }
 }
@@ -200,17 +200,22 @@ class GenericFilterSet(django_filters.FilterSet):
 #   order_default - order by parameter - can generate using Orderer.order_key
 def create_filter_set(model_fields, view_name, *, custom_fields=None, order_default=None) -> GenericFilterSet:
 
-    print('--> Creating filter...\nfields: {}\nview name: {}, custom fields: {}\n'.format(
-        model_fields,
-        view_name,
-        custom_fields
-    ))
+    print('Creating filter with view name: {}, ordering: {}\n'.format(view_name, order_default))
 
     # first set name of class to create
     cls_name = 'Filter{}'.format(view_name)
 
+    # initialise class dictionary as empty
+    cls_dict = {}
+
+    # set default order
+    cls_dict['order_default'] = order_default
+
+    # add ordering filter - create FIRST so it is the first thing that appears on the order form
+    cls_dict['order_by'] = Orderer.get_order_filter(model_fields)
+
     # create class dictionary - intial values are custom field filter_instances
-    cls_dict = custom_fields or {}
+    cls_dict.update(custom_fields or {})
 
     # get dictionary of fields to their filter dict elements
     field_filters = get_field_filters(model_fields)
@@ -231,11 +236,7 @@ def create_filter_set(model_fields, view_name, *, custom_fields=None, order_defa
         # create filter instance itself and add to class dictionary
         cls_dict[field.name] = get_filter(field, cls_name, filter_class, widget_class, widget_attrs)
 
-    # set default order
-    cls_dict['order_default'] = order_default
 
-    # add ordering filter
-    cls_dict['order_by'] = Orderer.get_order_filter(model_fields)
 
     # create class type
     return type(cls_name, (GenericFilterSet, ), cls_dict)

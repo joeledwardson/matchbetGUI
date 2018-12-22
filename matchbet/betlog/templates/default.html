@@ -4,9 +4,6 @@
     {% load templatefunctions %}
     {% include "head.html" %}
 
-
-
-
     <body>
         <div class="container">
 
@@ -49,21 +46,22 @@
             </div>
 
 
-            <!-- get form variables -->
-            {# form_url is form's post url #}
-            {% get_url view.view_name view.view_kwargs as form_url %}
-
-
 
             <!-- new model form (hidden) -->
             {% block form_new %}
+
+            {# set form_title input #}
             {% add_str "New " view.model|get_model_name as form_title %}
+
+            {# set form_url input post destination from view name and kwargs #}
+            {% get_url view.view_name view.view_kwargs as form_url %}
 
             {% include "form.html" %}
             {% endblock %}
 
             <!-- filter form (hidden) -->
             {% block form_filter %}
+
             {# set form variable and container, form IDs - must be different to new form! #}
             {% with form_title="Filter" form=view.filter.form form_div_id="filterform" form_content_id="filtercontent" %}
 
@@ -75,13 +73,9 @@
             {# page break #}
             <hr>
 
-            {# show datbase table - user filter queryset in context #}
-            {% include "table.html" %}
+            {# show datbase table - user filter queryset in context, parsed as table_list from view #}
+            {% include "table.html" with field_titles=view.field_titles table_list=view.table_list %}
             <br>
-
-            {# show log at bottom #}
-            {% include "log.html" %}
-
 
         </div>
 

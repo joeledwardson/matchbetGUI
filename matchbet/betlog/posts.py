@@ -2,6 +2,9 @@
 from .log import server_logger
 from .forms import form_classes
 from .names import get_field_name, model_name
+from .models import SiteExchange
+
+is_site_exchange = lambda model_object: issubclass(type(model_object), SiteExchange)
 
 # get form errors in string form
 # typical format
@@ -27,6 +30,7 @@ def errors_string(form):
     #       get verbose name from class [cls] with key [k] and join list [e] together
     error_list = ['{} - {}'.format(get_field_name(cls, k), ''.join(e)) for k in keys for e in errors[k]]
     return ' '.join(error_list)
+
 
 # create form instance from class type and post data
 def create_form(cls, post):
@@ -56,8 +60,12 @@ def new_object(request, class_type):
         # save object in database
         obj.save()
 
+        # add balance adjust to site balance (if is exchange type)
+        if is_site_exchange(obj):
+            obj.site.update_balance(obj.balanceAdjust)
+
         # update log file new model
-        server_logger.info('New {model} added: {object}'.format(model=class_name, object=obj))
+        server_logger.info('New {model}: {object}'.format(model=class_name, object=obj))
 
         # success
         return True
@@ -72,3 +80,34 @@ def new_object(request, class_type):
 
         # failure
         return False
+
+
+# func to call to delete object
+def delete(obj):
+
+    # get object string
+    object_str = str(obj)
+
+    # reverse site balance adjustment (if is exchange type)
+    if is_site_exchange(obj):
+        obj.site.update_balance(-1 * obj.balanceAdjust)
+
+    # delete object
+    obj.delete()
+
+    # update logger
+    server_logger.info('Deleted {model}: {object}'.format(
+        model=model_name(obj._meta.model),
+        object=object_str,
+    ))
+
+
+# func to call on updating an object
+def update(new_object):
+
+    # update log
+    server_logger.info('Updated: {}'.format(new_object))
+
+    # re-calculate site balance (if is exchange type)
+    if is_site_exchange(new_object):
+        new_object.site.calculate_balance()

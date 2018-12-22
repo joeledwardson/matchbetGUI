@@ -3,25 +3,10 @@ from django.db.models import Model
 from django.http import HttpResponseRedirect
 
 from betlog.log import server_logger
-from betlog.names import model_name, model_update_viewname, model_delete_viewname, viewname_app
+from betlog.names import model_name, model_update_viewname
+from betlog.posts import delete, update
 
 from .edit import GenericEditView, store_last_view, generic_edit_class
-
-
-# func to call to delete object
-def delete(object):
-
-    # get object string
-    object_str = str(object)
-
-    # delete object
-    object.delete()
-
-    # update logger
-    server_logger.info('Successfully deleted {model}: {object}'.format(
-        model=model_name(object._meta.model),
-        object=object_str,
-    ))
 
 
 # Update view class - for editing an object instance
@@ -43,8 +28,11 @@ class CommonUpdateView(GenericEditView, UpdateView):
         # get context from django Update view
         context = UpdateView.get_context_data(self, **kwargs)
 
-        # set form post url
-        context['form_url'] = self.get_return_url()
+        # set form post url to current url
+        context['form_url'] = self.request.path
+
+        # return url for cancel button
+        context['return_url'] = self.get_return_url()
 
         # set form title
         context['form_title'] = 'Update {}'.format(model_name(self.model))
@@ -54,18 +42,17 @@ class CommonUpdateView(GenericEditView, UpdateView):
     # func called when a form is validated
     def form_valid(self, form):
 
-        # get old object for log
+        # get old object
         old_object = self.get_object()
 
         # call super to actually validate form
         redirect = super().form_valid(form)
 
-        # update log
-        server_logger.info('{model} {old} updated to {new}'.format(
-            model=model_name(self.model),
-            old=old_object,
-            new=self.object)
-        )
+        # get new object
+        new_object = self.get_object()
+
+        # update object
+        update(new_object)
 
         # return re-direction url - will either return to page or use success url
         return redirect
@@ -73,12 +60,6 @@ class CommonUpdateView(GenericEditView, UpdateView):
     # override get function - store last view name & kwrags this so template can read it for cancel button
     @store_last_view
     def get(self, request, *args, **kwargs):
-
-        # get current url - used as action of post in template
-        # self.my_url = request.path
-
-        # get previous url to return to on cancel
-        # self.cancel_url = self.get_return_url()
 
         return super().get(request, *args, **kwargs)
 

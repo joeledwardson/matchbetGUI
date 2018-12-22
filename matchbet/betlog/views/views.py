@@ -1,5 +1,4 @@
-from betlog.names import viewname_app, model_delete_viewname
-from betlog.sessions import set_last_view
+from betlog.names import viewname_app
 from betlog.models import Site, Match, Transaction, Bet
 
 from .update import update_view_class
@@ -34,8 +33,6 @@ views_site['default'].get_object_link = lambda self, site: reverse(
 # dont allow deleting of sites - must be done in admin
 views_site['update'].allow_delete = False
 
-
-
 # Match View
 views_match = model_views(Match)
 
@@ -57,12 +54,3 @@ def default_view(request):
 
 # view classes - must put in order! used by default in navigation pane of template
 view_classes = [views_site, views_transaction, views_bet, views_match]
-
-#
-# # override get function - need to set last view first
-# @set_last_view
-# def get(self, request, *args, **kwargs):
-#
-#     # return page response
-#     return super(type(self), self).get(request, *args, **kwargs)
-

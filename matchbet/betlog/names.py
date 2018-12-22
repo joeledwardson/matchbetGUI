@@ -23,10 +23,6 @@ def model_viewname(model):
 def model_name(model):
     return model._meta.verbose_name.capitalize().strip()
 
-# create a delete view name from a django model
-def model_delete_viewname(model):
-    return '{}_delete'.format(model_viewname(model))
-
 # create an update view name from a django model
 def model_update_viewname(model):
     return '{}_update'.format(model_viewname(model))
@@ -34,16 +30,14 @@ def model_update_viewname(model):
 def get_field_name(cls, arg):
     return cls._meta.get_field(arg).verbose_name
 
-
-# for a POST, append view name with either "success" or "failure"
-def _append_success(v, success):
-    return '{}_{}'.format(v, 'success' if success else 'failure')
-
 # add app name to view name (required for calling reverse)
 def viewname_app(v):
     return '{}:{}'.format(BetlogConfig.name, v)
 
-# add app name to view name (required for calling reverse), append with "success" or "failure", denoting info
-def viewname_info_app(v, success):
-    return _append_success(viewname_app(v), success)
+# print a dictionary
+def print_dict(d: dict, nm: str):
 
+    print('Printing contents of dictionary: {}'.format(nm))
+
+    for key in d:
+        print('{}: {}'.format(key, d[key]))

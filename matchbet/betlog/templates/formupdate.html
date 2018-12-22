@@ -24,10 +24,12 @@ Inputs (inherited from 'form.html'):
 {# cancel button to return to standard list (default closes form) #}
 {% block form_buttons %}
 <button type="submit" class="btn btn-success">Submit</button>
-<a href="{{ form_url }}">
+
+<a href="{{ return_url }}">
     <input type="button"class="btn btn-default" value="Cancel">
 </a>
-<input type="submit" name="delete_button" class="btn btn-warning" data-toggle="confirmation" value="Delete">
+
+<button type="submit" class="btn btn-warning" name="delete_button" data-toggle="confirmation">Delete</button>
 {% endblock %}
 
 {% block form_bottom %}

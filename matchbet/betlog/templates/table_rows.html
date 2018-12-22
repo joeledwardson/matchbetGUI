@@ -1,0 +1,21 @@
+{% load templatefunctions %}
+
+{% comment %}
+Print table rows
+    table_rows - list containing
+        item 0 - link to update object
+        item 1 - list of values corresponding to field_titles to display
+        item 2 - css row formatting class
+{% endcomment %}
+
+{% for o in table_rows %}
+<tr class="row-link {{ o.2 }}" updatelink="{{ o.0 }}">
+
+    {# get attribute values and list in table #}
+    {% for v in o.1 %}
+    <td>{{ v }}</td>
+    {% endfor %}
+
+</tr>
+
+{% endfor %}

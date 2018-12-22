@@ -23,3 +23,41 @@
 2018-11-29 20:59:11,863 - INFO - New Transaction added: Site Bet365: Deposit £12.50
 2018-11-29 21:00:50,170 - INFO - New Transaction added: Site Bet365: Deposit £10.00
 2018-11-29 21:18:28,757 - INFO - New Transaction added: Site Williamshill: Withdraw £10.00
+2018-12-02 14:58:29,164 - INFO - New Transaction added: Site Bet365: Withdraw £5.00
+2018-12-02 14:59:31,595 - INFO - New Transaction added: Site Bet365: Withdraw £5.00
+2018-12-02 14:59:54,393 - INFO - New Transaction added: Site Bet365: Withdraw £5.00
+2018-12-09 16:16:51,950 - INFO - New Bet added: Loss £5.00 on 25 Nov, 18: Chelsea vs Man United - Williamshill. 2018-12-09 16:16:00+00:00
+2018-12-09 18:23:59,765 - INFO - New Transaction added: Site Bet365: Withdraw £5.00
+2018-12-09 18:24:13,214 - INFO - New Transaction added: Site Bet365: Withdraw £5.00
+2018-12-09 18:24:17,254 - INFO - New Transaction added: Site Bet365: Withdraw £5.00
+2018-12-09 18:24:21,167 - INFO - New Transaction added: Site Bet365: Withdraw £5.00
+2018-12-15 15:19:17,817 - INFO - New Bet added: Win £7.00 on 14 Nov, 18: Arsenal vs Tottenham - Bet365. 2018-11-27 00:00:00+00:00
+2018-12-15 15:21:31,431 - INFO - New Bet added: Win £8.00 on 14 Nov, 18: Arsenal vs Tottenham - Bet365. 2018-11-27 00:00:00+00:00
+2018-12-15 15:22:44,411 - INFO - New Bet added: Lay bet £6.00 on 07 Nov, 18: West Ham vs Chelsea - Williamshill. 2018-11-08 00:00:00+00:00
+2018-12-15 15:30:12,077 - INFO - Transaction Site Bet365: Withdraw £7.00 updated to Site Bet365: Withdraw £8.00
+2018-12-15 15:32:39,594 - INFO - Transaction Site Bet365: Withdraw £8.00 updated to Site Bet365: Withdraw £10.75
+2018-12-15 15:46:28,731 - INFO - New Transaction added: Site Betfair: Deposit £7.50
+2018-12-15 15:46:59,604 - INFO - Transaction Site Betfair: Deposit £7.50 updated to Site Betfair: Deposit £8.50
+2018-12-15 15:47:13,169 - INFO - Successfully deleted Transaction: Site Betfair: Deposit £8.50
+2018-12-15 15:50:22,619 - INFO - Bet Loss £5.00 on 25 Nov, 18: Chelsea vs Man United - Williamshill. 2018-12-09 16:16:00+00:00 updated to Loss £7.50 on 25 Nov, 18: Chelsea vs Man United - Williamshill. 2018-12-09 16:16:00+00:00
+2018-12-15 15:58:21,254 - INFO - Bet Win £5.00 on 14 Nov, 18: Arsenal vs Tottenham - Bet365. 27 Nov, 18 updated to Win £6.00 on 14 Nov, 18: Arsenal vs Tottenham - Bet365. 27 Nov, 18
+2018-12-15 16:06:12,433 - INFO - Updated: Site Bet365: Deposit £12.00
+2018-12-15 16:07:55,214 - INFO - Updated: Win £8.50 on 14 Nov, 18, Arsenal vs Tottenham - Bet365 placed 27 Nov, 18
+2018-12-15 16:12:52,484 - INFO - Updated: Win £10.50 on Bet365, Arsenal, Tottenham vs 14 Nov, 18
+2018-12-15 16:13:23,077 - INFO - Updated: Win £12.00 on Bet365, Arsenal vs Tottenham 14 Nov, 18
+2018-12-15 16:13:51,375 - INFO - Updated: Win £13.00 on Bet365, Arsenal vs Tottenham 14 Nov 18
+2018-12-15 16:15:13,555 - ERROR - New Bet failed: Balance Adjust - Input value must be greater than 0 (server handles negation).
+2018-12-15 19:08:42,406 - INFO - Updated: Site Bet365: Withdraw £12.30
+2018-12-16 20:47:33,713 - INFO - Updated: Site Bet365: Withdraw £12.40
+2018-12-16 20:53:13,156 - INFO - New Transaction: Site Just another one: Deposit £5.00
+2018-12-16 20:53:36,537 - ERROR - New Transaction failed: Balance Adjust - Input value must be greater than 0 (server handles negation).
+2018-12-21 11:16:09,145 - INFO - Updated: Win £14.00 on Bet365, Arsenal vs Tottenham 14 Nov 18
+2018-12-21 11:17:01,188 - INFO - Updated: Site Just another one: Fee £10.00
+2018-12-21 13:22:47,601 - INFO - New Transaction: Site Betfair: Deposit £10.00
+2018-12-21 17:50:52,893 - INFO - New Site: hello
+2018-12-21 17:53:28,865 - ERROR - New Site failed: Name - Site with this Name already exists.
+2018-12-21 17:53:41,379 - INFO - New Site: hello there
+2018-12-21 18:04:26,984 - INFO - New Site: asdf
+2018-12-21 18:05:30,406 - INFO - New Site: asdfds
+2018-12-21 18:07:46,045 - ERROR - New Site failed: Name - Site with this Name already exists.
+2018-12-21 18:08:31,760 - INFO - New Transaction: Site Bet365: Withdraw £5.00

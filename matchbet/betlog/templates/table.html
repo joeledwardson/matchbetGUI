@@ -1,6 +1,4 @@
 {% load templatefunctions %}
-{% with displayRows=10 extra_id="table_rows_extra" %}
-
 
 {% comment %}
 Print database table 
@@ -13,56 +11,28 @@ Inputs
 {% endcomment %}
 
 <div>
-<table id="db-table" class="table table-bordered">
+    <table id="db-table" class="table table-bordered">
 
-    {# display table headings #}
-    <thead>
-        <tr>
-            {% for f in view.field_titles %}
-            <th>{{ f }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
+        {# display table headings #}
+        <thead>
+            <tr>
+                {% for f in field_titles %}
+                <th>{{ f }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
 
-    {# loop objects #}
-    <tbody>
+        {# loop objects #}
+        <tbody>
+            {% include "table_rows.html" with table_rows=table_list %}
+        </tbody>
 
-    {% for o in view.table_list %}
-        <tr class="row-link {{ o.2 }}" updatelink="{{ o.0 }}">
-            
-            {# get attribute values and list in table #}
-            {% for v in o.1 %}
-            <td>{{ v }}</td>
-            {% endfor %}
+    </table>
 
-        </tr>
+    <div id="table-load-icon" style="display:none">
+        <div  class="d-flex justify-content-center">
+            <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+        </div>
+    </div>
 
-        {% if forloop.counter == displayRows and not forloop.last %}
-            {# at max display rows, create new hidden tbody #}
-            </tbody>
-            <tbody id={{ extra_id }} style="display:none">
-
-        {% elif forloop.last %}
-            {# last element in for loop - end tbody #}
-            </tbody>
-
-            {% if forloop.counter > displayRows %}
-                {# in last element in for loop and have hidden tbody #}
-                <tfoot><tr><td colspan="{{ view.field_titles|length }}">
-                    <input
-                    type="button"
-                    class="btn-toggler {% button_classes %}"
-                    target_id="{{ extra_id }}"
-                    show_prompt="Show more"
-                    hide_prompt="Show less"
-                    style="width:100%">
-                </td></tr></tfoot>
-            {% endif %}
-        {% endif %}
-
-    {# end qs #}
-    {% endfor %}
-
-</table>
 </div>
-{% endwith %}

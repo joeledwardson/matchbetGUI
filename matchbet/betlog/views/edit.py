@@ -3,7 +3,7 @@ from django.shortcuts import reverse
 from django.db.models import Model
 
 from betlog.sessions import get_last_view_name, get_last_view_kwargs
-from betlog.names import viewname_app, model_viewname, viewname_info_app, model_name
+from betlog.names import viewname_app, model_viewname, model_name
 from betlog.forms import form_classes
 
 class GenericEditView(SingleObjectMixin):
@@ -14,19 +14,31 @@ class GenericEditView(SingleObjectMixin):
     # re-direct to last view with success in url
     def get_return_info_url(self, success=True):
 
+        # initialise kwargs dict with from view kwargs or set to empty dict
+        kwargs = self.from_view_kwargs or {}
+
+        # set message variable to prompt alert on loading webpage
+        kwargs['message_var'] = success
+
         # append success to previous view name for re-direction
         return reverse(
-            viewname_info_app(self.from_view_name, success=success),
-            kwargs=self.from_view_kwargs
+            viewname_app(self.from_view_name),
+            kwargs=kwargs
         )
 
     # re-direct to last view (no info)
     def get_return_url(self):
 
+        # initialise kwargs dict with from view kwargs or set to empty dict
+        kwargs = self.from_view_kwargs or {}
+
+        # delete message variable so on returning with no update, not prompted with message
+        kwargs.pop('message_var', None)
+
         # get previous view name and kwargs
         return reverse(
             viewname_app(self.from_view_name),
-            kwargs=self.from_view_kwargs
+            kwargs=kwargs
         )
 
 # func to store from_view_name and from_view_kwargs from session into self

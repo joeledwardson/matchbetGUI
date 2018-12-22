@@ -23,23 +23,18 @@ def create_form_class(model) -> ModelForm:
 class SiteLog_FormView(TemplateView):
 
     form_classes = {model: create_form_class(model) for model in models}
-    forms = {model: None for model in models}
 
-    site = None
+    def get_forms(self, site):
 
-# decorative function to be called over get
-#   get() MUST define self.site
-#   func sets self.form_bet and self.form_transaction instances
-def update_forms(get):
+        # forms initial data is the site pk (site is hidden to user)
+        initial={siteFieldName: site.pk}
 
-    def inner(self: SiteLog_FormView, request, *args, **kwargs):
-
-        initial={siteFieldName: self.site.pk}
+        # create blank array to assign forms
+        forms = {}
 
         # assign form instances using form classes
-        for mdl in self.form_classes:
-            self.forms[mdl] = self.form_classes[mdl](initial=initial)
+        for model in models:
+            forms[model] = self.form_classes[model](initial=initial)
 
-        return get(self, request, *args, **kwargs)
-
-    return inner
+        # return array of forms
+        return forms

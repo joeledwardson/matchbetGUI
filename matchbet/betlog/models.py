@@ -5,16 +5,14 @@ from django.core.validators import RegexValidator
 from moneyed.localization import format_money
 from moneyed import Money
 
-
-# *** Common structure
-# For classes to be to accesed from common functions in views_classes.py, form_classes.py they must contain [attributes_table] with a
-# list of attribute names to display (do not include id, it is hidden in table.html template by default.
-# Must also include [attributes_form] to be read by form.py which determines which attributes to display
-
+# field that holds UK currency
 class MyMoneyField(models.DecimalField):
     @staticmethod
     def money_str(amount):
         return format_money(Money(amount, 'GBP'), locale='en_GB')
+
+# formate just date from datetimefield or datefield
+date_format = lambda date: date.date().strftime('%d %b %y')
 
 # return all fields (not id, or any auto incrementing fields)
 # get all editable field names not id, (or any auto incrementing fields)
@@ -26,6 +24,7 @@ fields_all = lambda model: [f for f in model._meta.fields if not is_pk(f, model)
 fields_editable = lambda model: [f for f in fields_all(model) if f.editable]
 fieldnames_all = lambda model: [f.name for f in fields_all(model)]
 fieldnames_editable = lambda model: [f.name for f in fields_editable(model)]
+
 
 # *************************************************** Types ************************************************************
 class ModelType(models.Model):
@@ -65,16 +64,6 @@ class Site(models.Model):
                          verbose_name='Balance',
                          editable=False)
 
-    # number of current open bets
-    openBets = models.IntegerField(default=0,
-                                   verbose_name="Open Bets",
-                                   editable=False)
-    # additional comments
-    comment = models.CharField(max_length=255,
-                               verbose_name="Comments",
-                               default="",
-                               blank=True) # allow blank
-
 
     def __str__(self):
         return self.name
@@ -91,6 +80,31 @@ class Site(models.Model):
         self.save()
 
 
+# Abstract class which alters the balance of a site
+class SiteExchange(models.Model):
+
+    class Meta:
+        abstract = True
+
+    # site in which bet is placed
+    site = models.ForeignKey(Site,
+                             on_delete=models.CASCADE,
+                             verbose_name="Site")
+
+    # amount to change site balance
+    balanceAdjust = MyMoneyField(
+        max_digits=7,
+        decimal_places=2,
+        blank=False,
+        default=5.0,
+        verbose_name="Balance Adjust")
+
+    # date of balance change
+    date = models.DateTimeField(default=timezone.now,
+                                verbose_name="Date",
+                                blank=False)
+
+
 # **************************************************** Matches *********************************************************
 # Betting matches
 class Match(models.Model):
@@ -102,10 +116,6 @@ class Match(models.Model):
                              verbose_name="Team 2",
                              blank=False)
 
-    inPlay = models.BooleanField(default=True,
-                                 verbose_name="In-play",
-                                 editable=False)
-
     date = models.DateTimeField(
         default=timezone.now,
         verbose_name="Date Complete")
@@ -113,93 +123,51 @@ class Match(models.Model):
 
     # e.g. arsenal vs tottenham on 12/10/2018
     def __str__(self):
-        return '{}: {} vs {}'.format(self.date.date().strftime('%d %b, %y'), self.team1, self.team2)
-
-    @classmethod
-    def attribute_names(cls):
-        return ['team1', 'team2', 'inPlay', 'date']
+        return '{} vs {} {}'.format(
+            self.team1,
+            self.team2,
+            date_format(self.date))
 
     class Meta:
         verbose_name_plural = 'Matches'
 
+
 # ************************************************* Bets ***************************************************************
 # Bet class
-class Bet(models.Model):
+class Bet(SiteExchange):
 
     # type of bet
     betType = models.ForeignKey(BetType,
                                 on_delete=models.CASCADE,
                                 verbose_name="Type")
 
-    # site in which bet is placed
-    site = models.ForeignKey(Site,
-                             on_delete=models.CASCADE,
-                             verbose_name="Site")
-
     # corresponding match bet is placed
     match = models.ForeignKey(Match,
                               on_delete=models.CASCADE,
                               verbose_name="Match")
-
-    # amount placed on bet
-    balanceAdjust = MyMoneyField(
-        max_digits=7,
-        decimal_places=2,
-        blank=False,
-        default=5.0,
-        verbose_name="Balance Adjust")
-
 
     # descrption of bet - e.g. arsenal to win
     description = models.CharField(verbose_name='Description',
                                    max_length=255,
                                    blank=True)
 
-    # date bet placed (not match complete!)
-    date = models.DateTimeField(default=timezone.now,
-                                verbose_name="Date",
-                                blank=False)
-
-    # e.g. Lay Bet - 10 on arsenal vs chelsea on 12/10/2018
+    # e.g. Lay bet 10 on Williamshill, arsenal vs chelsea on 12/10/2018
     def __str__(self):
-        return '{} {} on {} - {}. {}'.format(
+        return '{} {} on {}, {}'.format(
             self.betType,
             MyMoneyField.money_str(abs(self.balanceAdjust)),
-            self.match,
             self.site,
-            self.date)
-
+            self.match)
 
 # ******************************************************* Transactions *************************************************
 # Transaction - transfer money to or from Site
-class Transaction(models.Model):
-
-    # corresponding website making the transaction
-    site = models.ForeignKey(
-        Site,
-        on_delete=models.CASCADE,
-        verbose_name="Site")
+class Transaction(SiteExchange):
 
     # transaction type
     transactionType = models.ForeignKey(
         TransactionType,
         on_delete=models.CASCADE,
         verbose_name="Type")
-
-    # currency in/out
-    balanceAdjust = MyMoneyField(
-        max_digits=7,
-        decimal_places=2,
-        blank=False,
-        default=10.0,
-        verbose_name="Balance Adjust")
-
-    # transaction date
-    date = models.fields.DateTimeField(
-        default=timezone.now,
-        verbose_name="Date",
-        blank=False,
-    )
 
     # e.g. Desposit £10 to Bet365
     def __str__(self):

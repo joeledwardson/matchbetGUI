@@ -1,13 +1,25 @@
 from django.views.generic import TemplateView
-from django.shortcuts import reverse
+from django.shortcuts import reverse, render
 from django.db.models.fields import DateTimeField
 from django.utils.dateformat import format
+from django.http import JsonResponse
 
 from betlog.models import MyMoneyField
 from betlog.names import viewname_app, model_update_viewname
 
+# step size - number of database elements to load at a time
+TABLE_STEP_SIZE = 10
+
+# get list slice using step size
+def list_slice(l, step, i):
+    return l[slice(step*i, step*(i+1))]
+
+
+# date time format is day of month (j), suffix (S), 3 letter month (M), 2 letter year (y) , 24-hour (H), minutes (i)
+# e.g. 31st Jan, 19:21
 datetime_format = lambda dt: format(dt, 'jS M y, H:i')
 
+# default field formatters to apply to table elements  when creating from queryset
 field_formatters = {
     MyMoneyField: MyMoneyField.money_str,
     DateTimeField: datetime_format,
@@ -17,7 +29,6 @@ field_formatters = {
 #   MUST be derived with a class which has
 #       get_table_qs() - for retrieving queryset for table
 #       view_name - required for forming return-to view for update link
-
 class TableView(TemplateView):
 
     _table_formatters = None
@@ -64,23 +75,13 @@ class TableView(TemplateView):
 
         return self._table_formatters[field_name](v)
 
+    # get db table data from queryset, formatted into template form
+    #   index 0 - object link
+    #   index 1 - list of values
+    #   index 2 - css formatting class
+    def get_template_table(self, qs):
 
-# get context data for table - saves to class instance (access as view.[variable] in template)
-# to be used as a decorator
-def get_table_context_data(get_context_data):
-
-    def inner(self: TableView, **kwargs):
-
-        context = get_context_data(self, **kwargs)
-
-        # get query set
-        qs = self.get_table_qs()
-
-        # create db list of entries
-        #   index 0 - object link
-        #   index 1 - list of values
-        #   index 2 - css formatting class
-        table_list = [
+        return [
             [
                 self.get_object_link(o),
                 [self.get_obj_attr(o, f) for f in self._field_names],
@@ -88,10 +89,51 @@ def get_table_context_data(get_context_data):
 
             ] for o in qs]
 
-        # assign to view
-        self.table_list = table_list
 
-        return context
+# table get wrapper - if pg_num is specified return a dict containing
+#   table_list: next values in table
+#   end: boolean value, if true means are at end of table
+def table_getter(get):
+
+    # inner function to wrap around get
+    def inner(self: TableView, request, *args, **kwargs):
+
+        # get page number pg_num from kwargs
+        pg = kwargs.get('pg_num')
+
+        if pg is not None:
+
+            # request is ajax for more content, use page number for slice
+            qs =  list_slice(self.get_table_qs(), TABLE_STEP_SIZE, pg)
+
+            # get template formatted table rows
+            rows = self.get_template_table(qs)
+
+            data = {
+                # set boolean value to true if reached end of table
+                'end': qs is not None,
+
+                # render the "table_rows" file using the slice, takes [table_rows] as an input
+                'table_data': render(request, "table_rows.html", {'table_rows': rows})
+            }
+
+            # return Json data
+            return JsonResponse(data)
+
+        else:
+            # no pg_num var, render page as normal
+
+            # call get() first, probably required to set qs before retrieval
+            response = get(self, request, *args, **kwargs)
+
+            # get first slice query set
+            qs =  list_slice(self.get_table_qs(), TABLE_STEP_SIZE, 0)
+
+            # get template formatted table list and assign to view
+            self.table_list = self.get_template_table(qs)
+
+            # return original response
+            return response
 
     return inner
 
@@ -107,7 +149,6 @@ def table_view_class(fields, view_name, field_formatters=field_formatters) -> Ta
     table_formatters = {
         field.name: field_formatters.get(type(field)) or val for field in fields
     }
-
 
     # class dictionary for class
     cls_dict = {

@@ -1,4 +1,4 @@
-from .models import TransactionType, BetType
+from .models import TransactionType, BetType, Site
 from functools import reduce
 import operator
 from django.db.models import Q
@@ -23,5 +23,12 @@ for mdl, names in model_types.items():
 
     print_warning = lambda m: print('"{}" not found in "{}" list - consider deleting..'.format(m, model_viewname(mdl)))
     list(map(print_warning, extras))
+
+for site in Site._default_manager.all():
+    oldBalance = site.balance
+    print('{} balance: {}'.format(site, oldBalance))
+    site.calculate_balance()
+    if oldBalance != site.balance:
+        print('Balance was incorrect, updated to {}'.format(site.balance))
 
 print('done')
